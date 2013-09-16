@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.1.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_1_0.dtd">
+<service-builder package-path="org.politaktiv.meinungsbild.infrastructure">
+	<author>politaktiv</author>
+	<namespace>meinungsbild</namespace>
+
+	<entity name="Topic" local-service="true" remote-service="true">
+
+		<!-- PK fields -->
+
+		<column name="topicId" type="long" primary="true" />
+
+		<!-- Audit fields -->
+
+		<column name="name" type="String" />
+		<column name="communityId" type="long" />
+
+
+		<!-- Finder methods -->
+
+		<finder name="CommunityId" return-type="Collection">
+			<finder-column name="communityId" />
+		</finder>
+		
+	</entity>
+	
+	<entity name="Rating" local-service="true" remote-service="true">
+
+		<!-- PK fields -->
+	
+		<column name="ratingId" type="long" primary="true" />
+	
+		<!-- Audit fields -->
+	
+		<column name="userId" type="long" />
+		<column name="subtopicId" type="long" />
+		<column name="score" type="int" />
+	
+	
+		<!-- Finder methods -->
+	
+		<finder name="SubtopicId" return-type="Collection">
+			<finder-column name="subtopicId" />
+		</finder>
+		
+		<finder name="ByUserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>
+		
+		<finder name="UserIdAndSubtopicId" return-type="Rating">
+			<finder-column name="userId" />
+			<finder-column name="subtopicId" />
+		</finder>
+		
+	</entity>
+	
+	<entity name="Subtopic" local-service="true" remote-service="true">
+	
+	<!-- PK fields -->
+	
+		<column name="subtopicId" type="long" primary="true" />
+		
+		
+		<!-- Audit fields -->
+	
+		<column name="name" type="String" />
+		<column name="url" type="String" />
+		<column name="parentTopic" type="long" />
+		
+		<finder name="TopicId" return-type="Collection">
+			<finder-column name="parentTopic" />
+		</finder>
+	
+	</entity>
+</service-builder>

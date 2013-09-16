@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<resource-action-mapping>
+	<portlet-resource>
+        <portlet-name>politaktiv-aktuelles-meinungsbild</portlet-name>
+        <permissions>
+            <supports>
+                <action-key>ADD_TO_PAGE</action-key>
+                <action-key>CONFIGURATION</action-key>
+                <action-key>VIEW</action-key>
+            </supports>
+            <community-defaults>
+                <action-key>VIEW</action-key>
+            </community-defaults>
+            <guest-defaults>
+                <action-key>VIEW</action-key>
+            </guest-defaults>
+            <guest-unsupported>
+                <action-key>CONFIGURATION</action-key>
+            </guest-unsupported>
+        </permissions>
+    </portlet-resource>
+    
+    <model-resource>
+    	<model-name>com.PA.meinungsbild.infrastructure.model.Topic</model-name>
+    	<portlet-ref>
+    		<portlet-name>politaktiv-aktuelles-meinungsbild</portlet-name>
+    	</portlet-ref>
+    	
+    	<supports>
+    		<action-key>ADD</action-key>
+    		<action-key>DELETE</action-key>
+    	</supports>
+    	
+    	<community-defaults />
+    	<guest-defaults />
+    	<guest-unsupported>
+    		<action-key>ADD</action-key>
+    		<action-key>DELETE</action-key>
+    	</guest-unsupported>
+    </model-resource>
+    <model-resource>
+    	<model-name>com.PA.meinungsbild.infrastructure.model.Subtopic</model-name>
+    	<portlet-ref>
+    		<portlet-name>politaktiv-aktuelles-meinungsbild</portlet-name>
+    	</portlet-ref>
+    	
+    	<supports>
+    		<action-key>ADD</action-key>
+    		<action-key>MOVE_TO_OTHER_TOPIC</action-key>
+    		<action-key>DELETE</action-key>
+    	</supports>
+    	
+    	<community-defaults />
+    	<guest-defaults />
+    	<guest-unsupported>
+    		<action-key>ADD</action-key>
+    		<action-key>MOVE_TO_OTHER_TOPIC</action-key>
+    		<action-key>DELETE</action-key>
+    	</guest-unsupported>
+    </model-resource>
+    
+	<model-resource>
+    	<model-name>com.PA.meinungsbild.infrastructure.model.Rating</model-name>
+    	<portlet-ref>
+    		<portlet-name>politaktiv-aktuelles-meinungsbild</portlet-name>
+    	</portlet-ref>
+    	
+    	<supports>
+    		<action-key>RATE</action-key>
+    	</supports>
+    	
+    	<community-defaults>
+    		<action-key>RATE</action-key>
+    	</community-defaults>
+    	<guest-defaults />
+    	<guest-unsupported>
+    		<action-key>RATE</action-key>
+    	</guest-unsupported>
+    </model-resource> 
+</resource-action-mapping>

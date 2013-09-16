@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete/>
+		<persistence-unit-defaults>
+			<access>PROPERTY</access>
+		</persistence-unit-defaults>
+	</persistence-unit-metadata>
+	<mapped-superclass class="com.PA.meinungsbild.infrastructure.model.impl.RatingModelImpl">
+		<attributes>
+			<id name="ratingId" />
+			<basic name="userId" />
+			<basic name="subtopicId" />
+			<basic name="score" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.PA.meinungsbild.infrastructure.model.impl.SubtopicModelImpl">
+		<attributes>
+			<id name="subtopicId" />
+			<basic name="name" />
+			<basic name="url" />
+			<basic name="parentTopic" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.PA.meinungsbild.infrastructure.model.impl.TopicModelImpl">
+		<attributes>
+			<id name="topicId" />
+			<basic name="name" />
+			<basic name="communityId" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="org.politaktiv.meinungsbild.infrastructure.model.impl.RatingModelImpl">
+		<attributes>
+			<id name="ratingId" />
+			<basic name="userId" />
+			<basic name="subtopicId" />
+			<basic name="score" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicModelImpl">
+		<attributes>
+			<id name="subtopicId" />
+			<basic name="name" />
+			<basic name="url" />
+			<basic name="parentTopic" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="org.politaktiv.meinungsbild.infrastructure.model.impl.TopicModelImpl">
+		<attributes>
+			<id name="topicId" />
+			<basic name="name" />
+			<basic name="communityId" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<entity class="com.PA.meinungsbild.infrastructure.model.impl.RatingImpl" name="Rating">
+		<table name="meinungsbild_Rating" />
+		<attributes />
+	</entity>
+	<entity class="com.PA.meinungsbild.infrastructure.model.impl.SubtopicImpl" name="Subtopic">
+		<table name="meinungsbild_Subtopic" />
+		<attributes>
+			<transient name="fullCommunityScore" />
+		</attributes>
+	</entity>
+	<entity class="com.PA.meinungsbild.infrastructure.model.impl.TopicImpl" name="Topic">
+		<table name="meinungsbild_Topic" />
+		<attributes>
+			<transient name="subtopics" />
+		</attributes>
+	</entity>
+	<entity class="org.politaktiv.meinungsbild.infrastructure.model.impl.RatingImpl" name="Rating">
+		<table name="meinungsbild_Rating" />
+		<attributes />
+	</entity>
+	<entity class="org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicImpl" name="Subtopic">
+		<table name="meinungsbild_Subtopic" />
+		<attributes />
+	</entity>
+	<entity class="org.politaktiv.meinungsbild.infrastructure.model.impl.TopicImpl" name="Topic">
+		<table name="meinungsbild_Topic" />
+		<attributes />
+	</entity>
+</entity-mappings>

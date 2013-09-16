@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<portlet-app
+	version="2.0"
+	xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+>
+	<portlet>
+		<portlet-name>politaktiv-aktuelles-meinungsbild</portlet-name>
+		<display-name>politaktiv aktuelles Meinungsbild</display-name>
+		<portlet-class>org.politaktiv.meinungsbild.application.MeinungsbildPortlet</portlet-class>
+		<init-param>
+			<name>view-jsp</name>
+			<value>/view.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<supported-locale>en</supported-locale>
+		<supported-locale>de</supported-locale>
+		<supported-locale>sv</supported-locale>
+		<resource-bundle>content.Language</resource-bundle>
+		<portlet-info>
+			<title>Politaktiv aktuelles Meinungsbild Portlet</title>
+			<short-title>Meinungsbild Portlet</short-title>
+			<keywords>meinungsbild</keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
+</portlet-app>

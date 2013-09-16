@@ -1,0 +1,13 @@
+ReleaseNotes:
+
+6.1.0.2 - 19.9.2012
+----------------------------
+* name validation with german umlaute
+* changes database databype from varchar(75) to varchar(250) for longer urls
+
+6.1.0.1 - 09.04.2012
+-----------------------------
+first release
+* moderation
+* rating with ajax
+* fancy css stuff

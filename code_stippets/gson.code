@@ -1,0 +1,19 @@
+
+
+some java gson source:
+-------------------------------------
+			resourceResponse.setContentType("application/json");
+			resourceResponse.resetBuffer();	
+			
+			
+			UserRatingServerAnswer userRatingServerAnswer = new UserRatingServerAnswer(true);
+			String userRatingServerAnswerString = new Gson().toJson(userRatingServerAnswer);
+			resourceResponse.getWriter().print(userRatingServerAnswerString);
+			
+			
+			
+some javscript code:
+--------------------------------------
+var result = this.get('responseData');
+var JsonObject = A.JSON.parse(result);
+alert(JsonObject.successFull);
