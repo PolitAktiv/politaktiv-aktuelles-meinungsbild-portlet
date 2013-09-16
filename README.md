@@ -1,0 +1,2 @@
+politaktiv-aktuelles-meinungsbild-portlet
+=========================================
