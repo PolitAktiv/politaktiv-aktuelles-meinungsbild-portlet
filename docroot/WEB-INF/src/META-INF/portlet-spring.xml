@@ -3,29 +3,23 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.RatingLocalService" class="org.politaktiv.meinungsbild.infrastructure.service.impl.RatingLocalServiceImpl" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.RatingLocalServiceUtil" class="org.politaktiv.meinungsbild.infrastructure.service.RatingLocalServiceUtil">
-		<property name="service" ref="org.politaktiv.meinungsbild.infrastructure.service.RatingLocalService" />
 	</bean>
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.RatingService" class="org.politaktiv.meinungsbild.infrastructure.service.impl.RatingServiceImpl" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.RatingServiceUtil" class="org.politaktiv.meinungsbild.infrastructure.service.RatingServiceUtil">
-		<property name="service" ref="org.politaktiv.meinungsbild.infrastructure.service.RatingService" />
 	</bean>
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.persistence.RatingPersistence" class="org.politaktiv.meinungsbild.infrastructure.service.persistence.RatingPersistenceImpl" parent="basePersistence" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.SubtopicLocalService" class="org.politaktiv.meinungsbild.infrastructure.service.impl.SubtopicLocalServiceImpl" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.SubtopicLocalServiceUtil" class="org.politaktiv.meinungsbild.infrastructure.service.SubtopicLocalServiceUtil">
-		<property name="service" ref="org.politaktiv.meinungsbild.infrastructure.service.SubtopicLocalService" />
 	</bean>
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.SubtopicService" class="org.politaktiv.meinungsbild.infrastructure.service.impl.SubtopicServiceImpl" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.SubtopicServiceUtil" class="org.politaktiv.meinungsbild.infrastructure.service.SubtopicServiceUtil">
-		<property name="service" ref="org.politaktiv.meinungsbild.infrastructure.service.SubtopicService" />
 	</bean>
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.persistence.SubtopicPersistence" class="org.politaktiv.meinungsbild.infrastructure.service.persistence.SubtopicPersistenceImpl" parent="basePersistence" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.TopicLocalService" class="org.politaktiv.meinungsbild.infrastructure.service.impl.TopicLocalServiceImpl" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.TopicLocalServiceUtil" class="org.politaktiv.meinungsbild.infrastructure.service.TopicLocalServiceUtil">
-		<property name="service" ref="org.politaktiv.meinungsbild.infrastructure.service.TopicLocalService" />
 	</bean>
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.TopicService" class="org.politaktiv.meinungsbild.infrastructure.service.impl.TopicServiceImpl" />
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.TopicServiceUtil" class="org.politaktiv.meinungsbild.infrastructure.service.TopicServiceUtil">
-		<property name="service" ref="org.politaktiv.meinungsbild.infrastructure.service.TopicService" />
 	</bean>
 	<bean id="org.politaktiv.meinungsbild.infrastructure.service.persistence.TopicPersistence" class="org.politaktiv.meinungsbild.infrastructure.service.persistence.TopicPersistenceImpl" parent="basePersistence" />
 </beans>

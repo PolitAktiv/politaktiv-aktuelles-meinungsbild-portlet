@@ -3,7 +3,7 @@
     <wb-module deploy-name="politaktiv-aktuelles-meinungsbild-portlet">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/docroot/WEB-INF/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/docroot/WEB-INF/service"/>
         <property name="context-root" value="politaktiv-aktuelles-meinungsbild-portlet"/>
         <property name="java-output-path" value="/politaktiv-aktuelles-meinungsbild-portlet/build/classes"/>
     </wb-module>
