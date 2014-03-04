@@ -13,6 +13,7 @@
 			<basic name="userId" />
 			<basic name="subtopicId" />
 			<basic name="score" />
+			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
 			<transient name="userUuid" />
@@ -24,6 +25,7 @@
 			<basic name="name" />
 			<basic name="url" />
 			<basic name="parentTopic" />
+			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
 		</attributes>
@@ -33,6 +35,7 @@
 			<id name="topicId" />
 			<basic name="name" />
 			<basic name="communityId" />
+			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
 		</attributes>

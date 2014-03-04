@@ -1,15 +1,15 @@
 /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0
- *        
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package org.politaktiv.meinungsbild.infrastructure.model.impl;
@@ -36,7 +36,9 @@ import java.io.Serializable;
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Subtopic service. Represents a row in the &quot;meinungsbild_Subtopic&quot; database table, with each column mapped to a property of this class.
@@ -68,6 +70,8 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 		};
 	public static final String TABLE_SQL_CREATE = "create table meinungsbild_Subtopic (subtopicId LONG not null primary key,name VARCHAR(75) null,url VARCHAR(250) null,parentTopic LONG)";
 	public static final String TABLE_SQL_DROP = "drop table meinungsbild_Subtopic";
+	public static final String ORDER_BY_JPQL = " ORDER BY subtopic.subtopicId ASC";
+	public static final String ORDER_BY_SQL = " ORDER BY meinungsbild_Subtopic.subtopicId ASC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
@@ -81,6 +85,7 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 				"value.object.column.bitmask.enabled.org.politaktiv.meinungsbild.infrastructure.model.Subtopic"),
 			true);
 	public static long PARENTTOPIC_COLUMN_BITMASK = 1L;
+	public static long SUBTOPICID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -89,6 +94,10 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 	 * @return the normal model instance
 	 */
 	public static Subtopic toModel(SubtopicSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
 		Subtopic model = new SubtopicImpl();
 
 		model.setSubtopicId(soapModel.getSubtopicId());
@@ -106,6 +115,10 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 	 * @return the normal model instances
 	 */
 	public static List<Subtopic> toModels(SubtopicSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
 		List<Subtopic> models = new ArrayList<Subtopic>(soapModels.length);
 
 		for (SubtopicSoap soapModel : soapModels) {
@@ -121,40 +134,88 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 	public SubtopicModelImpl() {
 	}
 
+	@Override
 	public long getPrimaryKey() {
 		return _subtopicId;
 	}
 
+	@Override
 	public void setPrimaryKey(long primaryKey) {
 		setSubtopicId(primaryKey);
 	}
 
+	@Override
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_subtopicId);
+		return _subtopicId;
 	}
 
+	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	@Override
 	public Class<?> getModelClass() {
 		return Subtopic.class;
 	}
 
+	@Override
 	public String getModelClassName() {
 		return Subtopic.class.getName();
 	}
 
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("subtopicId", getSubtopicId());
+		attributes.put("name", getName());
+		attributes.put("url", getUrl());
+		attributes.put("parentTopic", getParentTopic());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long subtopicId = (Long)attributes.get("subtopicId");
+
+		if (subtopicId != null) {
+			setSubtopicId(subtopicId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String url = (String)attributes.get("url");
+
+		if (url != null) {
+			setUrl(url);
+		}
+
+		Long parentTopic = (Long)attributes.get("parentTopic");
+
+		if (parentTopic != null) {
+			setParentTopic(parentTopic);
+		}
+	}
+
 	@JSON
+	@Override
 	public long getSubtopicId() {
 		return _subtopicId;
 	}
 
+	@Override
 	public void setSubtopicId(long subtopicId) {
 		_subtopicId = subtopicId;
 	}
 
 	@JSON
+	@Override
 	public String getName() {
 		if (_name == null) {
 			return StringPool.BLANK;
@@ -164,11 +225,13 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 		}
 	}
 
+	@Override
 	public void setName(String name) {
 		_name = name;
 	}
 
 	@JSON
+	@Override
 	public String getUrl() {
 		if (_url == null) {
 			return StringPool.BLANK;
@@ -178,15 +241,18 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 		}
 	}
 
+	@Override
 	public void setUrl(String url) {
 		_url = url;
 	}
 
 	@JSON
+	@Override
 	public long getParentTopic() {
 		return _parentTopic;
 	}
 
+	@Override
 	public void setParentTopic(long parentTopic) {
 		_columnBitmask |= PARENTTOPIC_COLUMN_BITMASK;
 
@@ -208,29 +274,26 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 	}
 
 	@Override
-	public Subtopic toEscapedModel() {
-		if (_escapedModelProxy == null) {
-			_escapedModelProxy = (Subtopic)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelProxyInterfaces,
-					new AutoEscapeBeanHandler(this));
-		}
-
-		return _escapedModelProxy;
-	}
-
-	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					Subtopic.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			Subtopic.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
+	}
+
+	@Override
+	public Subtopic toEscapedModel() {
+		if (_escapedModel == null) {
+			_escapedModel = (Subtopic)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+		}
+
+		return _escapedModel;
 	}
 
 	@Override
@@ -247,6 +310,7 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 		return subtopicImpl;
 	}
 
+	@Override
 	public int compareTo(Subtopic subtopic) {
 		long primaryKey = subtopic.getPrimaryKey();
 
@@ -263,18 +327,15 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Subtopic)) {
 			return false;
 		}
 
-		Subtopic subtopic = null;
-
-		try {
-			subtopic = (Subtopic)obj;
-		}
-		catch (ClassCastException cce) {
-			return false;
-		}
+		Subtopic subtopic = (Subtopic)obj;
 
 		long primaryKey = subtopic.getPrimaryKey();
 
@@ -346,6 +407,7 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 		return sb.toString();
 	}
 
+	@Override
 	public String toXmlString() {
 		StringBundler sb = new StringBundler(16);
 
@@ -376,7 +438,7 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 	}
 
 	private static ClassLoader _classLoader = Subtopic.class.getClassLoader();
-	private static Class<?>[] _escapedModelProxyInterfaces = new Class[] {
+	private static Class<?>[] _escapedModelInterfaces = new Class[] {
 			Subtopic.class
 		};
 	private long _subtopicId;
@@ -385,7 +447,6 @@ public class SubtopicModelImpl extends BaseModelImpl<Subtopic>
 	private long _parentTopic;
 	private long _originalParentTopic;
 	private boolean _setOriginalParentTopic;
-	private transient ExpandoBridge _expandoBridge;
 	private long _columnBitmask;
-	private Subtopic _escapedModelProxy;
+	private Subtopic _escapedModel;
 }

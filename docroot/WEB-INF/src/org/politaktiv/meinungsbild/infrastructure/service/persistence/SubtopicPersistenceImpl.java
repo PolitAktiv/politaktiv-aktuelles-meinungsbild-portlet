@@ -1,21 +1,19 @@
 /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0
- *        
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package org.politaktiv.meinungsbild.infrastructure.service.persistence;
 
-import com.liferay.portal.NoSuchModelException;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -35,11 +33,9 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
-import com.liferay.portal.service.persistence.BatchSessionUtil;
-import com.liferay.portal.service.persistence.ResourcePersistence;
-import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException;
@@ -77,14 +73,23 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 		".List1";
 	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
 		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+			SubtopicModelImpl.FINDER_CACHE_ENABLED, SubtopicImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+			SubtopicModelImpl.FINDER_CACHE_ENABLED, SubtopicImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+			SubtopicModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_TOPICID = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
 			SubtopicModelImpl.FINDER_CACHE_ENABLED, SubtopicImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByTopicId",
 			new String[] {
 				Long.class.getName(),
 				
-			"java.lang.Integer", "java.lang.Integer",
-				"com.liferay.portal.kernel.util.OrderByComparator"
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
 			});
 	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID =
 		new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
@@ -96,360 +101,6 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 			SubtopicModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByTopicId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-			SubtopicModelImpl.FINDER_CACHE_ENABLED, SubtopicImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-			SubtopicModelImpl.FINDER_CACHE_ENABLED, SubtopicImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-			SubtopicModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-
-	/**
-	 * Caches the subtopic in the entity cache if it is enabled.
-	 *
-	 * @param subtopic the subtopic
-	 */
-	public void cacheResult(Subtopic subtopic) {
-		EntityCacheUtil.putResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-			SubtopicImpl.class, subtopic.getPrimaryKey(), subtopic);
-
-		subtopic.resetOriginalValues();
-	}
-
-	/**
-	 * Caches the subtopics in the entity cache if it is enabled.
-	 *
-	 * @param subtopics the subtopics
-	 */
-	public void cacheResult(List<Subtopic> subtopics) {
-		for (Subtopic subtopic : subtopics) {
-			if (EntityCacheUtil.getResult(
-						SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-						SubtopicImpl.class, subtopic.getPrimaryKey()) == null) {
-				cacheResult(subtopic);
-			}
-			else {
-				subtopic.resetOriginalValues();
-			}
-		}
-	}
-
-	/**
-	 * Clears the cache for all subtopics.
-	 *
-	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
-	 * </p>
-	 */
-	@Override
-	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(SubtopicImpl.class.getName());
-		}
-
-		EntityCacheUtil.clearCache(SubtopicImpl.class.getName());
-
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-	}
-
-	/**
-	 * Clears the cache for the subtopic.
-	 *
-	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
-	 * </p>
-	 */
-	@Override
-	public void clearCache(Subtopic subtopic) {
-		EntityCacheUtil.removeResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-			SubtopicImpl.class, subtopic.getPrimaryKey());
-
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-	}
-
-	@Override
-	public void clearCache(List<Subtopic> subtopics) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-
-		for (Subtopic subtopic : subtopics) {
-			EntityCacheUtil.removeResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-				SubtopicImpl.class, subtopic.getPrimaryKey());
-		}
-	}
-
-	/**
-	 * Creates a new subtopic with the primary key. Does not add the subtopic to the database.
-	 *
-	 * @param subtopicId the primary key for the new subtopic
-	 * @return the new subtopic
-	 */
-	public Subtopic create(long subtopicId) {
-		Subtopic subtopic = new SubtopicImpl();
-
-		subtopic.setNew(true);
-		subtopic.setPrimaryKey(subtopicId);
-
-		return subtopic;
-	}
-
-	/**
-	 * Removes the subtopic with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param subtopicId the primary key of the subtopic
-	 * @return the subtopic that was removed
-	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public Subtopic remove(long subtopicId)
-		throws NoSuchSubtopicException, SystemException {
-		return remove(Long.valueOf(subtopicId));
-	}
-
-	/**
-	 * Removes the subtopic with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param primaryKey the primary key of the subtopic
-	 * @return the subtopic that was removed
-	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Subtopic remove(Serializable primaryKey)
-		throws NoSuchSubtopicException, SystemException {
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Subtopic subtopic = (Subtopic)session.get(SubtopicImpl.class,
-					primaryKey);
-
-			if (subtopic == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
-				}
-
-				throw new NoSuchSubtopicException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
-			}
-
-			return remove(subtopic);
-		}
-		catch (NoSuchSubtopicException nsee) {
-			throw nsee;
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	@Override
-	protected Subtopic removeImpl(Subtopic subtopic) throws SystemException {
-		subtopic = toUnwrappedModel(subtopic);
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			BatchSessionUtil.delete(session, subtopic);
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		clearCache(subtopic);
-
-		return subtopic;
-	}
-
-	@Override
-	public Subtopic updateImpl(
-		org.politaktiv.meinungsbild.infrastructure.model.Subtopic subtopic,
-		boolean merge) throws SystemException {
-		subtopic = toUnwrappedModel(subtopic);
-
-		boolean isNew = subtopic.isNew();
-
-		SubtopicModelImpl subtopicModelImpl = (SubtopicModelImpl)subtopic;
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			BatchSessionUtil.update(session, subtopic, merge);
-
-			subtopic.setNew(false);
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-
-		if (isNew || !SubtopicModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-		}
-
-		else {
-			if ((subtopicModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						Long.valueOf(subtopicModelImpl.getOriginalParentTopic())
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TOPICID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID,
-					args);
-
-				args = new Object[] {
-						Long.valueOf(subtopicModelImpl.getParentTopic())
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TOPICID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID,
-					args);
-			}
-		}
-
-		EntityCacheUtil.putResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-			SubtopicImpl.class, subtopic.getPrimaryKey(), subtopic);
-
-		return subtopic;
-	}
-
-	protected Subtopic toUnwrappedModel(Subtopic subtopic) {
-		if (subtopic instanceof SubtopicImpl) {
-			return subtopic;
-		}
-
-		SubtopicImpl subtopicImpl = new SubtopicImpl();
-
-		subtopicImpl.setNew(subtopic.isNew());
-		subtopicImpl.setPrimaryKey(subtopic.getPrimaryKey());
-
-		subtopicImpl.setSubtopicId(subtopic.getSubtopicId());
-		subtopicImpl.setName(subtopic.getName());
-		subtopicImpl.setUrl(subtopic.getUrl());
-		subtopicImpl.setParentTopic(subtopic.getParentTopic());
-
-		return subtopicImpl;
-	}
-
-	/**
-	 * Returns the subtopic with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the subtopic
-	 * @return the subtopic
-	 * @throws com.liferay.portal.NoSuchModelException if a subtopic with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Subtopic findByPrimaryKey(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return findByPrimaryKey(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Returns the subtopic with the primary key or throws a {@link org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException} if it could not be found.
-	 *
-	 * @param subtopicId the primary key of the subtopic
-	 * @return the subtopic
-	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public Subtopic findByPrimaryKey(long subtopicId)
-		throws NoSuchSubtopicException, SystemException {
-		Subtopic subtopic = fetchByPrimaryKey(subtopicId);
-
-		if (subtopic == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + subtopicId);
-			}
-
-			throw new NoSuchSubtopicException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				subtopicId);
-		}
-
-		return subtopic;
-	}
-
-	/**
-	 * Returns the subtopic with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the subtopic
-	 * @return the subtopic, or <code>null</code> if a subtopic with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Subtopic fetchByPrimaryKey(Serializable primaryKey)
-		throws SystemException {
-		return fetchByPrimaryKey(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Returns the subtopic with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param subtopicId the primary key of the subtopic
-	 * @return the subtopic, or <code>null</code> if a subtopic with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public Subtopic fetchByPrimaryKey(long subtopicId)
-		throws SystemException {
-		Subtopic subtopic = (Subtopic)EntityCacheUtil.getResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-				SubtopicImpl.class, subtopicId);
-
-		if (subtopic == _nullSubtopic) {
-			return null;
-		}
-
-		if (subtopic == null) {
-			Session session = null;
-
-			boolean hasException = false;
-
-			try {
-				session = openSession();
-
-				subtopic = (Subtopic)session.get(SubtopicImpl.class,
-						Long.valueOf(subtopicId));
-			}
-			catch (Exception e) {
-				hasException = true;
-
-				throw processException(e);
-			}
-			finally {
-				if (subtopic != null) {
-					cacheResult(subtopic);
-				}
-				else if (!hasException) {
-					EntityCacheUtil.putResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
-						SubtopicImpl.class, subtopicId, _nullSubtopic);
-				}
-
-				closeSession(session);
-			}
-		}
-
-		return subtopic;
-	}
 
 	/**
 	 * Returns all the subtopics where parentTopic = &#63;.
@@ -458,6 +109,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @return the matching subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public List<Subtopic> findByTopicId(long parentTopic)
 		throws SystemException {
 		return findByTopicId(parentTopic, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
@@ -468,7 +120,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * Returns a range of all the subtopics where parentTopic = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param parentTopic the parent topic
@@ -477,6 +129,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @return the range of matching subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public List<Subtopic> findByTopicId(long parentTopic, int start, int end)
 		throws SystemException {
 		return findByTopicId(parentTopic, start, end, null);
@@ -486,7 +139,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * Returns an ordered range of all the subtopics where parentTopic = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param parentTopic the parent topic
@@ -496,13 +149,16 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @return the ordered range of matching subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public List<Subtopic> findByTopicId(long parentTopic, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
+		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 				(orderByComparator == null)) {
+			pagination = false;
 			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID;
 			finderArgs = new Object[] { parentTopic };
 		}
@@ -514,6 +170,16 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 		List<Subtopic> list = (List<Subtopic>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
+		if ((list != null) && !list.isEmpty()) {
+			for (Subtopic subtopic : list) {
+				if ((parentTopic != subtopic.getParentTopic())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
 		if (list == null) {
 			StringBundler query = null;
 
@@ -522,7 +188,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 						(orderByComparator.getOrderByFields().length * 3));
 			}
 			else {
-				query = new StringBundler(2);
+				query = new StringBundler(3);
 			}
 
 			query.append(_SQL_SELECT_SUBTOPIC_WHERE);
@@ -532,6 +198,10 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
 					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(SubtopicModelImpl.ORDER_BY_JPQL);
 			}
 
 			String sql = query.toString();
@@ -547,22 +217,29 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 
 				qPos.add(parentTopic);
 
-				list = (List<Subtopic>)QueryUtil.list(q, getDialect(), start,
-						end);
+				if (!pagination) {
+					list = (List<Subtopic>)QueryUtil.list(q, getDialect(),
+							start, end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<Subtopic>(list);
+				}
+				else {
+					list = (List<Subtopic>)QueryUtil.list(q, getDialect(),
+							start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
 				throw processException(e);
 			}
 			finally {
-				if (list == null) {
-					FinderCacheUtil.removeResult(finderPath, finderArgs);
-				}
-				else {
-					cacheResult(list);
-
-					FinderCacheUtil.putResult(finderPath, finderArgs, list);
-				}
-
 				closeSession(session);
 			}
 		}
@@ -573,44 +250,56 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	/**
 	 * Returns the first subtopic in the ordered set where parentTopic = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
 	 * @param parentTopic the parent topic
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching subtopic
 	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a matching subtopic could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public Subtopic findByTopicId_First(long parentTopic,
 		OrderByComparator orderByComparator)
 		throws NoSuchSubtopicException, SystemException {
+		Subtopic subtopic = fetchByTopicId_First(parentTopic, orderByComparator);
+
+		if (subtopic != null) {
+			return subtopic;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("parentTopic=");
+		msg.append(parentTopic);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchSubtopicException(msg.toString());
+	}
+
+	/**
+	 * Returns the first subtopic in the ordered set where parentTopic = &#63;.
+	 *
+	 * @param parentTopic the parent topic
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching subtopic, or <code>null</code> if a matching subtopic could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic fetchByTopicId_First(long parentTopic,
+		OrderByComparator orderByComparator) throws SystemException {
 		List<Subtopic> list = findByTopicId(parentTopic, 0, 1, orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("parentTopic=");
-			msg.append(parentTopic);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchSubtopicException(msg.toString());
-		}
-		else {
+		if (!list.isEmpty()) {
 			return list.get(0);
 		}
+
+		return null;
 	}
 
 	/**
 	 * Returns the last subtopic in the ordered set where parentTopic = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
 	 *
 	 * @param parentTopic the parent topic
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
@@ -618,37 +307,57 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a matching subtopic could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public Subtopic findByTopicId_Last(long parentTopic,
 		OrderByComparator orderByComparator)
 		throws NoSuchSubtopicException, SystemException {
+		Subtopic subtopic = fetchByTopicId_Last(parentTopic, orderByComparator);
+
+		if (subtopic != null) {
+			return subtopic;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("parentTopic=");
+		msg.append(parentTopic);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchSubtopicException(msg.toString());
+	}
+
+	/**
+	 * Returns the last subtopic in the ordered set where parentTopic = &#63;.
+	 *
+	 * @param parentTopic the parent topic
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching subtopic, or <code>null</code> if a matching subtopic could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic fetchByTopicId_Last(long parentTopic,
+		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByTopicId(parentTopic);
+
+		if (count == 0) {
+			return null;
+		}
 
 		List<Subtopic> list = findByTopicId(parentTopic, count - 1, count,
 				orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("parentTopic=");
-			msg.append(parentTopic);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchSubtopicException(msg.toString());
-		}
-		else {
+		if (!list.isEmpty()) {
 			return list.get(0);
 		}
+
+		return null;
 	}
 
 	/**
 	 * Returns the subtopics before and after the current subtopic in the ordered set where parentTopic = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
 	 *
 	 * @param subtopicId the primary key of the current subtopic
 	 * @param parentTopic the parent topic
@@ -657,6 +366,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public Subtopic[] findByTopicId_PrevAndNext(long subtopicId,
 		long parentTopic, OrderByComparator orderByComparator)
 		throws NoSuchSubtopicException, SystemException {
@@ -759,6 +469,9 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 				}
 			}
 		}
+		else {
+			query.append(SubtopicModelImpl.ORDER_BY_JPQL);
+		}
 
 		String sql = query.toString();
 
@@ -790,11 +503,446 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	}
 
 	/**
+	 * Removes all the subtopics where parentTopic = &#63; from the database.
+	 *
+	 * @param parentTopic the parent topic
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public void removeByTopicId(long parentTopic) throws SystemException {
+		for (Subtopic subtopic : findByTopicId(parentTopic, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
+			remove(subtopic);
+		}
+	}
+
+	/**
+	 * Returns the number of subtopics where parentTopic = &#63;.
+	 *
+	 * @param parentTopic the parent topic
+	 * @return the number of matching subtopics
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public int countByTopicId(long parentTopic) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_TOPICID;
+
+		Object[] finderArgs = new Object[] { parentTopic };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_SUBTOPIC_WHERE);
+
+			query.append(_FINDER_COLUMN_TOPICID_PARENTTOPIC_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(parentTopic);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_TOPICID_PARENTTOPIC_2 = "subtopic.parentTopic = ?";
+
+	public SubtopicPersistenceImpl() {
+		setModelClass(Subtopic.class);
+	}
+
+	/**
+	 * Caches the subtopic in the entity cache if it is enabled.
+	 *
+	 * @param subtopic the subtopic
+	 */
+	@Override
+	public void cacheResult(Subtopic subtopic) {
+		EntityCacheUtil.putResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+			SubtopicImpl.class, subtopic.getPrimaryKey(), subtopic);
+
+		subtopic.resetOriginalValues();
+	}
+
+	/**
+	 * Caches the subtopics in the entity cache if it is enabled.
+	 *
+	 * @param subtopics the subtopics
+	 */
+	@Override
+	public void cacheResult(List<Subtopic> subtopics) {
+		for (Subtopic subtopic : subtopics) {
+			if (EntityCacheUtil.getResult(
+						SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+						SubtopicImpl.class, subtopic.getPrimaryKey()) == null) {
+				cacheResult(subtopic);
+			}
+			else {
+				subtopic.resetOriginalValues();
+			}
+		}
+	}
+
+	/**
+	 * Clears the cache for all subtopics.
+	 *
+	 * <p>
+	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * </p>
+	 */
+	@Override
+	public void clearCache() {
+		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
+			CacheRegistryUtil.clear(SubtopicImpl.class.getName());
+		}
+
+		EntityCacheUtil.clearCache(SubtopicImpl.class.getName());
+
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+	}
+
+	/**
+	 * Clears the cache for the subtopic.
+	 *
+	 * <p>
+	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * </p>
+	 */
+	@Override
+	public void clearCache(Subtopic subtopic) {
+		EntityCacheUtil.removeResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+			SubtopicImpl.class, subtopic.getPrimaryKey());
+
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+	}
+
+	@Override
+	public void clearCache(List<Subtopic> subtopics) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Subtopic subtopic : subtopics) {
+			EntityCacheUtil.removeResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+				SubtopicImpl.class, subtopic.getPrimaryKey());
+		}
+	}
+
+	/**
+	 * Creates a new subtopic with the primary key. Does not add the subtopic to the database.
+	 *
+	 * @param subtopicId the primary key for the new subtopic
+	 * @return the new subtopic
+	 */
+	@Override
+	public Subtopic create(long subtopicId) {
+		Subtopic subtopic = new SubtopicImpl();
+
+		subtopic.setNew(true);
+		subtopic.setPrimaryKey(subtopicId);
+
+		return subtopic;
+	}
+
+	/**
+	 * Removes the subtopic with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param subtopicId the primary key of the subtopic
+	 * @return the subtopic that was removed
+	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic remove(long subtopicId)
+		throws NoSuchSubtopicException, SystemException {
+		return remove((Serializable)subtopicId);
+	}
+
+	/**
+	 * Removes the subtopic with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the subtopic
+	 * @return the subtopic that was removed
+	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic remove(Serializable primaryKey)
+		throws NoSuchSubtopicException, SystemException {
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Subtopic subtopic = (Subtopic)session.get(SubtopicImpl.class,
+					primaryKey);
+
+			if (subtopic == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				}
+
+				throw new NoSuchSubtopicException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
+			}
+
+			return remove(subtopic);
+		}
+		catch (NoSuchSubtopicException nsee) {
+			throw nsee;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	@Override
+	protected Subtopic removeImpl(Subtopic subtopic) throws SystemException {
+		subtopic = toUnwrappedModel(subtopic);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			if (!session.contains(subtopic)) {
+				subtopic = (Subtopic)session.get(SubtopicImpl.class,
+						subtopic.getPrimaryKeyObj());
+			}
+
+			if (subtopic != null) {
+				session.delete(subtopic);
+			}
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		if (subtopic != null) {
+			clearCache(subtopic);
+		}
+
+		return subtopic;
+	}
+
+	@Override
+	public Subtopic updateImpl(
+		org.politaktiv.meinungsbild.infrastructure.model.Subtopic subtopic)
+		throws SystemException {
+		subtopic = toUnwrappedModel(subtopic);
+
+		boolean isNew = subtopic.isNew();
+
+		SubtopicModelImpl subtopicModelImpl = (SubtopicModelImpl)subtopic;
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			if (subtopic.isNew()) {
+				session.save(subtopic);
+
+				subtopic.setNew(false);
+			}
+			else {
+				session.merge(subtopic);
+			}
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !SubtopicModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((subtopicModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						subtopicModelImpl.getOriginalParentTopic()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TOPICID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID,
+					args);
+
+				args = new Object[] { subtopicModelImpl.getParentTopic() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TOPICID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOPICID,
+					args);
+			}
+		}
+
+		EntityCacheUtil.putResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+			SubtopicImpl.class, subtopic.getPrimaryKey(), subtopic);
+
+		return subtopic;
+	}
+
+	protected Subtopic toUnwrappedModel(Subtopic subtopic) {
+		if (subtopic instanceof SubtopicImpl) {
+			return subtopic;
+		}
+
+		SubtopicImpl subtopicImpl = new SubtopicImpl();
+
+		subtopicImpl.setNew(subtopic.isNew());
+		subtopicImpl.setPrimaryKey(subtopic.getPrimaryKey());
+
+		subtopicImpl.setSubtopicId(subtopic.getSubtopicId());
+		subtopicImpl.setName(subtopic.getName());
+		subtopicImpl.setUrl(subtopic.getUrl());
+		subtopicImpl.setParentTopic(subtopic.getParentTopic());
+
+		return subtopicImpl;
+	}
+
+	/**
+	 * Returns the subtopic with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 *
+	 * @param primaryKey the primary key of the subtopic
+	 * @return the subtopic
+	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic findByPrimaryKey(Serializable primaryKey)
+		throws NoSuchSubtopicException, SystemException {
+		Subtopic subtopic = fetchByPrimaryKey(primaryKey);
+
+		if (subtopic == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			}
+
+			throw new NoSuchSubtopicException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
+		}
+
+		return subtopic;
+	}
+
+	/**
+	 * Returns the subtopic with the primary key or throws a {@link org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException} if it could not be found.
+	 *
+	 * @param subtopicId the primary key of the subtopic
+	 * @return the subtopic
+	 * @throws org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException if a subtopic with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic findByPrimaryKey(long subtopicId)
+		throws NoSuchSubtopicException, SystemException {
+		return findByPrimaryKey((Serializable)subtopicId);
+	}
+
+	/**
+	 * Returns the subtopic with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param primaryKey the primary key of the subtopic
+	 * @return the subtopic, or <code>null</code> if a subtopic with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic fetchByPrimaryKey(Serializable primaryKey)
+		throws SystemException {
+		Subtopic subtopic = (Subtopic)EntityCacheUtil.getResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+				SubtopicImpl.class, primaryKey);
+
+		if (subtopic == _nullSubtopic) {
+			return null;
+		}
+
+		if (subtopic == null) {
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				subtopic = (Subtopic)session.get(SubtopicImpl.class, primaryKey);
+
+				if (subtopic != null) {
+					cacheResult(subtopic);
+				}
+				else {
+					EntityCacheUtil.putResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+						SubtopicImpl.class, primaryKey, _nullSubtopic);
+				}
+			}
+			catch (Exception e) {
+				EntityCacheUtil.removeResult(SubtopicModelImpl.ENTITY_CACHE_ENABLED,
+					SubtopicImpl.class, primaryKey);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return subtopic;
+	}
+
+	/**
+	 * Returns the subtopic with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param subtopicId the primary key of the subtopic
+	 * @return the subtopic, or <code>null</code> if a subtopic with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Subtopic fetchByPrimaryKey(long subtopicId)
+		throws SystemException {
+		return fetchByPrimaryKey((Serializable)subtopicId);
+	}
+
+	/**
 	 * Returns all the subtopics.
 	 *
 	 * @return the subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public List<Subtopic> findAll() throws SystemException {
 		return findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
@@ -803,7 +951,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * Returns a range of all the subtopics.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of subtopics
@@ -811,6 +959,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @return the range of subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public List<Subtopic> findAll(int start, int end) throws SystemException {
 		return findAll(start, end, null);
 	}
@@ -819,7 +968,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * Returns an ordered range of all the subtopics.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of subtopics
@@ -828,18 +977,21 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @return the ordered range of subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public List<Subtopic> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
+		boolean pagination = true;
 		FinderPath finderPath = null;
-		Object[] finderArgs = new Object[] { start, end, orderByComparator };
+		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 				(orderByComparator == null)) {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			pagination = false;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
 			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
@@ -863,6 +1015,10 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 			}
 			else {
 				sql = _SQL_SELECT_SUBTOPIC;
+
+				if (pagination) {
+					sql = sql.concat(SubtopicModelImpl.ORDER_BY_JPQL);
+				}
 			}
 
 			Session session = null;
@@ -872,30 +1028,29 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 
 				Query q = session.createQuery(sql);
 
-				if (orderByComparator == null) {
+				if (!pagination) {
 					list = (List<Subtopic>)QueryUtil.list(q, getDialect(),
 							start, end, false);
 
 					Collections.sort(list);
+
+					list = new UnmodifiableList<Subtopic>(list);
 				}
 				else {
 					list = (List<Subtopic>)QueryUtil.list(q, getDialect(),
 							start, end);
 				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
 				throw processException(e);
 			}
 			finally {
-				if (list == null) {
-					FinderCacheUtil.removeResult(finderPath, finderArgs);
-				}
-				else {
-					cacheResult(list);
-
-					FinderCacheUtil.putResult(finderPath, finderArgs, list);
-				}
-
 				closeSession(session);
 			}
 		}
@@ -904,79 +1059,15 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	}
 
 	/**
-	 * Removes all the subtopics where parentTopic = &#63; from the database.
-	 *
-	 * @param parentTopic the parent topic
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void removeByTopicId(long parentTopic) throws SystemException {
-		for (Subtopic subtopic : findByTopicId(parentTopic)) {
-			remove(subtopic);
-		}
-	}
-
-	/**
 	 * Removes all the subtopics from the database.
 	 *
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void removeAll() throws SystemException {
 		for (Subtopic subtopic : findAll()) {
 			remove(subtopic);
 		}
-	}
-
-	/**
-	 * Returns the number of subtopics where parentTopic = &#63;.
-	 *
-	 * @param parentTopic the parent topic
-	 * @return the number of matching subtopics
-	 * @throws SystemException if a system exception occurred
-	 */
-	public int countByTopicId(long parentTopic) throws SystemException {
-		Object[] finderArgs = new Object[] { parentTopic };
-
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_TOPICID,
-				finderArgs, this);
-
-		if (count == null) {
-			StringBundler query = new StringBundler(2);
-
-			query.append(_SQL_COUNT_SUBTOPIC_WHERE);
-
-			query.append(_FINDER_COLUMN_TOPICID_PARENTTOPIC_2);
-
-			String sql = query.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query q = session.createQuery(sql);
-
-				QueryPos qPos = QueryPos.getInstance(q);
-
-				qPos.add(parentTopic);
-
-				count = (Long)q.uniqueResult();
-			}
-			catch (Exception e) {
-				throw processException(e);
-			}
-			finally {
-				if (count == null) {
-					count = Long.valueOf(0);
-				}
-
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_TOPICID,
-					finderArgs, count);
-
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
 	}
 
 	/**
@@ -985,6 +1076,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	 * @return the number of subtopics
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public int countAll() throws SystemException {
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
 				FINDER_ARGS_EMPTY, this);
@@ -998,18 +1090,17 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 				Query q = session.createQuery(_SQL_COUNT_SUBTOPIC);
 
 				count = (Long)q.uniqueResult();
-			}
-			catch (Exception e) {
-				throw processException(e);
-			}
-			finally {
-				if (count == null) {
-					count = Long.valueOf(0);
-				}
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
 					FINDER_ARGS_EMPTY, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY);
 
+				throw processException(e);
+			}
+			finally {
 				closeSession(session);
 			}
 		}
@@ -1031,7 +1122,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 
 				for (String listenerClassName : listenerClassNames) {
 					listenersList.add((ModelListener<Subtopic>)InstanceFactory.newInstance(
-							listenerClassName));
+							getClassLoader(), listenerClassName));
 				}
 
 				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
@@ -1045,24 +1136,14 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 	public void destroy() {
 		EntityCacheUtil.removeCache(SubtopicImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@BeanReference(type = RatingPersistence.class)
-	protected RatingPersistence ratingPersistence;
-	@BeanReference(type = SubtopicPersistence.class)
-	protected SubtopicPersistence subtopicPersistence;
-	@BeanReference(type = TopicPersistence.class)
-	protected TopicPersistence topicPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = UserPersistence.class)
-	protected UserPersistence userPersistence;
 	private static final String _SQL_SELECT_SUBTOPIC = "SELECT subtopic FROM Subtopic subtopic";
 	private static final String _SQL_SELECT_SUBTOPIC_WHERE = "SELECT subtopic FROM Subtopic subtopic WHERE ";
 	private static final String _SQL_COUNT_SUBTOPIC = "SELECT COUNT(subtopic) FROM Subtopic subtopic";
 	private static final String _SQL_COUNT_SUBTOPIC_WHERE = "SELECT COUNT(subtopic) FROM Subtopic subtopic WHERE ";
-	private static final String _FINDER_COLUMN_TOPICID_PARENTTOPIC_2 = "subtopic.parentTopic = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "subtopic.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Subtopic exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Subtopic exists with the key {";
@@ -1082,6 +1163,7 @@ public class SubtopicPersistenceImpl extends BasePersistenceImpl<Subtopic>
 		};
 
 	private static CacheModel<Subtopic> _nullSubtopicCacheModel = new CacheModel<Subtopic>() {
+			@Override
 			public Subtopic toEntityModel() {
 				return _nullSubtopic;
 			}

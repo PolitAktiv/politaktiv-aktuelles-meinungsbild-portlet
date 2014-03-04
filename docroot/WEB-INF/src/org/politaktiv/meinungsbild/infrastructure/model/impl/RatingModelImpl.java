@@ -1,15 +1,15 @@
 /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0
- *        
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package org.politaktiv.meinungsbild.infrastructure.model.impl;
@@ -37,7 +37,9 @@ import java.io.Serializable;
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Rating service. Represents a row in the &quot;meinungsbild_Rating&quot; database table, with each column mapped to a property of this class.
@@ -69,6 +71,8 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 		};
 	public static final String TABLE_SQL_CREATE = "create table meinungsbild_Rating (ratingId LONG not null primary key,userId LONG,subtopicId LONG,score INTEGER)";
 	public static final String TABLE_SQL_DROP = "drop table meinungsbild_Rating";
+	public static final String ORDER_BY_JPQL = " ORDER BY rating.ratingId ASC";
+	public static final String ORDER_BY_SQL = " ORDER BY meinungsbild_Rating.ratingId ASC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
@@ -83,6 +87,7 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 			true);
 	public static long SUBTOPICID_COLUMN_BITMASK = 1L;
 	public static long USERID_COLUMN_BITMASK = 2L;
+	public static long RATINGID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -91,6 +96,10 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	 * @return the normal model instance
 	 */
 	public static Rating toModel(RatingSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
 		Rating model = new RatingImpl();
 
 		model.setRatingId(soapModel.getRatingId());
@@ -108,6 +117,10 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	 * @return the normal model instances
 	 */
 	public static List<Rating> toModels(RatingSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
 		List<Rating> models = new ArrayList<Rating>(soapModels.length);
 
 		for (RatingSoap soapModel : soapModels) {
@@ -123,44 +136,93 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	public RatingModelImpl() {
 	}
 
+	@Override
 	public long getPrimaryKey() {
 		return _ratingId;
 	}
 
+	@Override
 	public void setPrimaryKey(long primaryKey) {
 		setRatingId(primaryKey);
 	}
 
+	@Override
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_ratingId);
+		return _ratingId;
 	}
 
+	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	@Override
 	public Class<?> getModelClass() {
 		return Rating.class;
 	}
 
+	@Override
 	public String getModelClassName() {
 		return Rating.class.getName();
 	}
 
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("ratingId", getRatingId());
+		attributes.put("userId", getUserId());
+		attributes.put("subtopicId", getSubtopicId());
+		attributes.put("score", getScore());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long ratingId = (Long)attributes.get("ratingId");
+
+		if (ratingId != null) {
+			setRatingId(ratingId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long subtopicId = (Long)attributes.get("subtopicId");
+
+		if (subtopicId != null) {
+			setSubtopicId(subtopicId);
+		}
+
+		Integer score = (Integer)attributes.get("score");
+
+		if (score != null) {
+			setScore(score);
+		}
+	}
+
 	@JSON
+	@Override
 	public long getRatingId() {
 		return _ratingId;
 	}
 
+	@Override
 	public void setRatingId(long ratingId) {
 		_ratingId = ratingId;
 	}
 
 	@JSON
+	@Override
 	public long getUserId() {
 		return _userId;
 	}
 
+	@Override
 	public void setUserId(long userId) {
 		_columnBitmask |= USERID_COLUMN_BITMASK;
 
@@ -173,10 +235,12 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 		_userId = userId;
 	}
 
+	@Override
 	public String getUserUuid() throws SystemException {
 		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
 	}
 
+	@Override
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
 	}
@@ -186,10 +250,12 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	}
 
 	@JSON
+	@Override
 	public long getSubtopicId() {
 		return _subtopicId;
 	}
 
+	@Override
 	public void setSubtopicId(long subtopicId) {
 		_columnBitmask |= SUBTOPICID_COLUMN_BITMASK;
 
@@ -207,10 +273,12 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	}
 
 	@JSON
+	@Override
 	public int getScore() {
 		return _score;
 	}
 
+	@Override
 	public void setScore(int score) {
 		_score = score;
 	}
@@ -220,29 +288,26 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	}
 
 	@Override
-	public Rating toEscapedModel() {
-		if (_escapedModelProxy == null) {
-			_escapedModelProxy = (Rating)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelProxyInterfaces,
-					new AutoEscapeBeanHandler(this));
-		}
-
-		return _escapedModelProxy;
-	}
-
-	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					Rating.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			Rating.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
+	}
+
+	@Override
+	public Rating toEscapedModel() {
+		if (_escapedModel == null) {
+			_escapedModel = (Rating)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+		}
+
+		return _escapedModel;
 	}
 
 	@Override
@@ -259,6 +324,7 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 		return ratingImpl;
 	}
 
+	@Override
 	public int compareTo(Rating rating) {
 		long primaryKey = rating.getPrimaryKey();
 
@@ -275,18 +341,15 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Rating)) {
 			return false;
 		}
 
-		Rating rating = null;
-
-		try {
-			rating = (Rating)obj;
-		}
-		catch (ClassCastException cce) {
-			return false;
-		}
+		Rating rating = (Rating)obj;
 
 		long primaryKey = rating.getPrimaryKey();
 
@@ -350,6 +413,7 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 		return sb.toString();
 	}
 
+	@Override
 	public String toXmlString() {
 		StringBundler sb = new StringBundler(16);
 
@@ -380,9 +444,7 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	}
 
 	private static ClassLoader _classLoader = Rating.class.getClassLoader();
-	private static Class<?>[] _escapedModelProxyInterfaces = new Class[] {
-			Rating.class
-		};
+	private static Class<?>[] _escapedModelInterfaces = new Class[] { Rating.class };
 	private long _ratingId;
 	private long _userId;
 	private String _userUuid;
@@ -392,7 +454,6 @@ public class RatingModelImpl extends BaseModelImpl<Rating>
 	private long _originalSubtopicId;
 	private boolean _setOriginalSubtopicId;
 	private int _score;
-	private transient ExpandoBridge _expandoBridge;
 	private long _columnBitmask;
-	private Rating _escapedModelProxy;
+	private Rating _escapedModel;
 }

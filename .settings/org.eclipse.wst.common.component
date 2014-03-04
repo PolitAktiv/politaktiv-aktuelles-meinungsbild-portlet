@@ -5,6 +5,6 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/docroot/WEB-INF/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/docroot/WEB-INF/service"/>
         <property name="context-root" value="politaktiv-aktuelles-meinungsbild-portlet"/>
-        <property name="java-output-path" value="/politaktiv-aktuelles-meinungsbild-portlet/build/classes"/>
+        <property name="java-output-path" value="/politaktiv-aktuelles-meinungsbild-portlet/docroot/WEB-INF/classes"/>
     </wb-module>
 </project-modules>

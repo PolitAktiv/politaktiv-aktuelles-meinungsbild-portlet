@@ -1,16 +1,15 @@
 /**
- /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0
- *        
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package org.politaktiv.meinungsbild.infrastructure.model.impl;
@@ -37,7 +36,9 @@ import java.io.Serializable;
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Topic service. Represents a row in the &quot;meinungsbild_Topic&quot; database table, with each column mapped to a property of this class.
@@ -67,6 +68,8 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 		};
 	public static final String TABLE_SQL_CREATE = "create table meinungsbild_Topic (topicId LONG not null primary key,name VARCHAR(75) null,communityId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table meinungsbild_Topic";
+	public static final String ORDER_BY_JPQL = " ORDER BY topic.topicId ASC";
+	public static final String ORDER_BY_SQL = " ORDER BY meinungsbild_Topic.topicId ASC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
@@ -80,6 +83,7 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 				"value.object.column.bitmask.enabled.org.politaktiv.meinungsbild.infrastructure.model.Topic"),
 			true);
 	public static long COMMUNITYID_COLUMN_BITMASK = 1L;
+	public static long TOPICID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -88,6 +92,10 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 	 * @return the normal model instance
 	 */
 	public static Topic toModel(TopicSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
 		Topic model = new TopicImpl();
 
 		model.setTopicId(soapModel.getTopicId());
@@ -104,6 +112,10 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 	 * @return the normal model instances
 	 */
 	public static List<Topic> toModels(TopicSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
 		List<Topic> models = new ArrayList<Topic>(soapModels.length);
 
 		for (TopicSoap soapModel : soapModels) {
@@ -119,40 +131,81 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 	public TopicModelImpl() {
 	}
 
+	@Override
 	public long getPrimaryKey() {
 		return _topicId;
 	}
 
+	@Override
 	public void setPrimaryKey(long primaryKey) {
 		setTopicId(primaryKey);
 	}
 
+	@Override
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_topicId);
+		return _topicId;
 	}
 
+	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	@Override
 	public Class<?> getModelClass() {
 		return Topic.class;
 	}
 
+	@Override
 	public String getModelClassName() {
 		return Topic.class.getName();
 	}
 
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("topicId", getTopicId());
+		attributes.put("name", getName());
+		attributes.put("communityId", getCommunityId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long topicId = (Long)attributes.get("topicId");
+
+		if (topicId != null) {
+			setTopicId(topicId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Long communityId = (Long)attributes.get("communityId");
+
+		if (communityId != null) {
+			setCommunityId(communityId);
+		}
+	}
+
 	@JSON
+	@Override
 	public long getTopicId() {
 		return _topicId;
 	}
 
+	@Override
 	public void setTopicId(long topicId) {
 		_topicId = topicId;
 	}
 
 	@JSON
+	@Override
 	public String getName() {
 		if (_name == null) {
 			return StringPool.BLANK;
@@ -162,15 +215,18 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 		}
 	}
 
+	@Override
 	public void setName(String name) {
 		_name = name;
 	}
 
 	@JSON
+	@Override
 	public long getCommunityId() {
 		return _communityId;
 	}
 
+	@Override
 	public void setCommunityId(long communityId) {
 		_columnBitmask |= COMMUNITYID_COLUMN_BITMASK;
 
@@ -192,29 +248,26 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 	}
 
 	@Override
-	public Topic toEscapedModel() {
-		if (_escapedModelProxy == null) {
-			_escapedModelProxy = (Topic)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelProxyInterfaces,
-					new AutoEscapeBeanHandler(this));
-		}
-
-		return _escapedModelProxy;
-	}
-
-	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					Topic.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			Topic.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
+	}
+
+	@Override
+	public Topic toEscapedModel() {
+		if (_escapedModel == null) {
+			_escapedModel = (Topic)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+		}
+
+		return _escapedModel;
 	}
 
 	@Override
@@ -230,6 +283,7 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 		return topicImpl;
 	}
 
+	@Override
 	public int compareTo(Topic topic) {
 		long primaryKey = topic.getPrimaryKey();
 
@@ -246,18 +300,15 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Topic)) {
 			return false;
 		}
 
-		Topic topic = null;
-
-		try {
-			topic = (Topic)obj;
-		}
-		catch (ClassCastException cce) {
-			return false;
-		}
+		Topic topic = (Topic)obj;
 
 		long primaryKey = topic.getPrimaryKey();
 
@@ -319,6 +370,7 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 		return sb.toString();
 	}
 
+	@Override
 	public String toXmlString() {
 		StringBundler sb = new StringBundler(13);
 
@@ -345,15 +397,12 @@ public class TopicModelImpl extends BaseModelImpl<Topic> implements TopicModel {
 	}
 
 	private static ClassLoader _classLoader = Topic.class.getClassLoader();
-	private static Class<?>[] _escapedModelProxyInterfaces = new Class[] {
-			Topic.class
-		};
+	private static Class<?>[] _escapedModelInterfaces = new Class[] { Topic.class };
 	private long _topicId;
 	private String _name;
 	private long _communityId;
 	private long _originalCommunityId;
 	private boolean _setOriginalCommunityId;
-	private transient ExpandoBridge _expandoBridge;
 	private long _columnBitmask;
-	private Topic _escapedModelProxy;
+	private Topic _escapedModel;
 }

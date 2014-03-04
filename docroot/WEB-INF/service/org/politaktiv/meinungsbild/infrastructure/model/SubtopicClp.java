@@ -1,29 +1,35 @@
 /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0
- *        
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package org.politaktiv.meinungsbild.infrastructure.model;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 
+import org.politaktiv.meinungsbild.infrastructure.service.ClpSerializer;
 import org.politaktiv.meinungsbild.infrastructure.service.SubtopicLocalServiceUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
+import java.lang.reflect.Method;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author politaktiv
@@ -32,87 +38,323 @@ public class SubtopicClp extends BaseModelImpl<Subtopic> implements Subtopic {
 	public SubtopicClp() {
 	}
 
+	@Override
 	public Class<?> getModelClass() {
 		return Subtopic.class;
 	}
 
+	@Override
 	public String getModelClassName() {
 		return Subtopic.class.getName();
 	}
 
+	@Override
 	public long getPrimaryKey() {
 		return _subtopicId;
 	}
 
+	@Override
 	public void setPrimaryKey(long primaryKey) {
 		setSubtopicId(primaryKey);
 	}
 
+	@Override
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_subtopicId);
+		return _subtopicId;
 	}
 
+	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("subtopicId", getSubtopicId());
+		attributes.put("name", getName());
+		attributes.put("url", getUrl());
+		attributes.put("parentTopic", getParentTopic());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long subtopicId = (Long)attributes.get("subtopicId");
+
+		if (subtopicId != null) {
+			setSubtopicId(subtopicId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String url = (String)attributes.get("url");
+
+		if (url != null) {
+			setUrl(url);
+		}
+
+		Long parentTopic = (Long)attributes.get("parentTopic");
+
+		if (parentTopic != null) {
+			setParentTopic(parentTopic);
+		}
+	}
+
+	@Override
 	public long getSubtopicId() {
 		return _subtopicId;
 	}
 
+	@Override
 	public void setSubtopicId(long subtopicId) {
 		_subtopicId = subtopicId;
+
+		if (_subtopicRemoteModel != null) {
+			try {
+				Class<?> clazz = _subtopicRemoteModel.getClass();
+
+				Method method = clazz.getMethod("setSubtopicId", long.class);
+
+				method.invoke(_subtopicRemoteModel, subtopicId);
+			}
+			catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		}
 	}
 
+	@Override
 	public String getName() {
 		return _name;
 	}
 
+	@Override
 	public void setName(String name) {
 		_name = name;
+
+		if (_subtopicRemoteModel != null) {
+			try {
+				Class<?> clazz = _subtopicRemoteModel.getClass();
+
+				Method method = clazz.getMethod("setName", String.class);
+
+				method.invoke(_subtopicRemoteModel, name);
+			}
+			catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		}
 	}
 
+	@Override
 	public String getUrl() {
 		return _url;
 	}
 
+	@Override
 	public void setUrl(String url) {
 		_url = url;
+
+		if (_subtopicRemoteModel != null) {
+			try {
+				Class<?> clazz = _subtopicRemoteModel.getClass();
+
+				Method method = clazz.getMethod("setUrl", String.class);
+
+				method.invoke(_subtopicRemoteModel, url);
+			}
+			catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		}
 	}
 
+	@Override
 	public long getParentTopic() {
 		return _parentTopic;
 	}
 
+	@Override
 	public void setParentTopic(long parentTopic) {
 		_parentTopic = parentTopic;
+
+		if (_subtopicRemoteModel != null) {
+			try {
+				Class<?> clazz = _subtopicRemoteModel.getClass();
+
+				Method method = clazz.getMethod("setParentTopic", long.class);
+
+				method.invoke(_subtopicRemoteModel, parentTopic);
+			}
+			catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		}
 	}
 
+	@Override
+	public void setFullCommunityScore(int score) {
+		try {
+			String methodName = "setFullCommunityScore";
+
+			Class<?>[] parameterTypes = new Class<?>[] { int.class };
+
+			Object[] parameterValues = new Object[] { score };
+
+			invokeOnRemoteModel(methodName, parameterTypes, parameterValues);
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
+
+	@Override
 	public void setRatingList(
 		java.util.List<org.politaktiv.meinungsbild.infrastructure.model.Rating> ratingList) {
-		throw new UnsupportedOperationException();
+		try {
+			String methodName = "setRatingList";
+
+			Class<?>[] parameterTypes = new Class<?>[] { java.util.List.class };
+
+			Object[] parameterValues = new Object[] { ratingList };
+
+			invokeOnRemoteModel(methodName, parameterTypes, parameterValues);
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
 	}
 
-	public boolean validate() {
-		throw new UnsupportedOperationException();
-	}
-
-	public int getCurentUserScore() {
-		throw new UnsupportedOperationException();
-	}
-
-	public void setCurrentUserScore(int score) {
-		throw new UnsupportedOperationException();
-	}
-
+	@Override
 	public int getFullCommunityScore() {
-		throw new UnsupportedOperationException();
+		try {
+			String methodName = "getFullCommunityScore";
+
+			Class<?>[] parameterTypes = new Class<?>[] {  };
+
+			Object[] parameterValues = new Object[] {  };
+
+			Integer returnObj = (Integer)invokeOnRemoteModel(methodName,
+					parameterTypes, parameterValues);
+
+			return returnObj;
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
 	}
 
-	public void setFullCommunityScore(int score) {
-		throw new UnsupportedOperationException();
+	@Override
+	public boolean validate() {
+		try {
+			String methodName = "validate";
+
+			Class<?>[] parameterTypes = new Class<?>[] {  };
+
+			Object[] parameterValues = new Object[] {  };
+
+			Boolean returnObj = (Boolean)invokeOnRemoteModel(methodName,
+					parameterTypes, parameterValues);
+
+			return returnObj;
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
 	}
 
+	@Override
+	public void setCurrentUserScore(int score) {
+		try {
+			String methodName = "setCurrentUserScore";
+
+			Class<?>[] parameterTypes = new Class<?>[] { int.class };
+
+			Object[] parameterValues = new Object[] { score };
+
+			invokeOnRemoteModel(methodName, parameterTypes, parameterValues);
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
+
+	@Override
+	public int getCurentUserScore() {
+		try {
+			String methodName = "getCurentUserScore";
+
+			Class<?>[] parameterTypes = new Class<?>[] {  };
+
+			Object[] parameterValues = new Object[] {  };
+
+			Integer returnObj = (Integer)invokeOnRemoteModel(methodName,
+					parameterTypes, parameterValues);
+
+			return returnObj;
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
+
+	public BaseModel<?> getSubtopicRemoteModel() {
+		return _subtopicRemoteModel;
+	}
+
+	public void setSubtopicRemoteModel(BaseModel<?> subtopicRemoteModel) {
+		_subtopicRemoteModel = subtopicRemoteModel;
+	}
+
+	public Object invokeOnRemoteModel(String methodName,
+		Class<?>[] parameterTypes, Object[] parameterValues)
+		throws Exception {
+		Object[] remoteParameterValues = new Object[parameterValues.length];
+
+		for (int i = 0; i < parameterValues.length; i++) {
+			if (parameterValues[i] != null) {
+				remoteParameterValues[i] = ClpSerializer.translateInput(parameterValues[i]);
+			}
+		}
+
+		Class<?> remoteModelClass = _subtopicRemoteModel.getClass();
+
+		ClassLoader remoteModelClassLoader = remoteModelClass.getClassLoader();
+
+		Class<?>[] remoteParameterTypes = new Class[parameterTypes.length];
+
+		for (int i = 0; i < parameterTypes.length; i++) {
+			if (parameterTypes[i].isPrimitive()) {
+				remoteParameterTypes[i] = parameterTypes[i];
+			}
+			else {
+				String parameterTypeName = parameterTypes[i].getName();
+
+				remoteParameterTypes[i] = remoteModelClassLoader.loadClass(parameterTypeName);
+			}
+		}
+
+		Method method = remoteModelClass.getMethod(methodName,
+				remoteParameterTypes);
+
+		Object returnValue = method.invoke(_subtopicRemoteModel,
+				remoteParameterValues);
+
+		if (returnValue != null) {
+			returnValue = ClpSerializer.translateOutput(returnValue);
+		}
+
+		return returnValue;
+	}
+
+	@Override
 	public void persist() throws SystemException {
 		if (this.isNew()) {
 			SubtopicLocalServiceUtil.addSubtopic(this);
@@ -124,7 +366,7 @@ public class SubtopicClp extends BaseModelImpl<Subtopic> implements Subtopic {
 
 	@Override
 	public Subtopic toEscapedModel() {
-		return (Subtopic)Proxy.newProxyInstance(Subtopic.class.getClassLoader(),
+		return (Subtopic)ProxyUtil.newProxyInstance(Subtopic.class.getClassLoader(),
 			new Class[] { Subtopic.class }, new AutoEscapeBeanHandler(this));
 	}
 
@@ -140,6 +382,7 @@ public class SubtopicClp extends BaseModelImpl<Subtopic> implements Subtopic {
 		return clone;
 	}
 
+	@Override
 	public int compareTo(Subtopic subtopic) {
 		long primaryKey = subtopic.getPrimaryKey();
 
@@ -156,18 +399,15 @@ public class SubtopicClp extends BaseModelImpl<Subtopic> implements Subtopic {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof SubtopicClp)) {
 			return false;
 		}
 
-		SubtopicClp subtopic = null;
-
-		try {
-			subtopic = (SubtopicClp)obj;
-		}
-		catch (ClassCastException cce) {
-			return false;
-		}
+		SubtopicClp subtopic = (SubtopicClp)obj;
 
 		long primaryKey = subtopic.getPrimaryKey();
 
@@ -201,6 +441,7 @@ public class SubtopicClp extends BaseModelImpl<Subtopic> implements Subtopic {
 		return sb.toString();
 	}
 
+	@Override
 	public String toXmlString() {
 		StringBundler sb = new StringBundler(16);
 
@@ -234,4 +475,5 @@ public class SubtopicClp extends BaseModelImpl<Subtopic> implements Subtopic {
 	private String _name;
 	private String _url;
 	private long _parentTopic;
+	private BaseModel<?> _subtopicRemoteModel;
 }

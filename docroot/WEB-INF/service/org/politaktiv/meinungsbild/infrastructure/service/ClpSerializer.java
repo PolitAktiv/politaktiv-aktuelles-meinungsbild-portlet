@@ -1,21 +1,26 @@
 /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0
- *        
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package org.politaktiv.meinungsbild.infrastructure.service;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ClassLoaderObjectInputStream;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModel;
@@ -24,13 +29,16 @@ import org.politaktiv.meinungsbild.infrastructure.model.RatingClp;
 import org.politaktiv.meinungsbild.infrastructure.model.SubtopicClp;
 import org.politaktiv.meinungsbild.infrastructure.model.TopicClp;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author politaktiv
  */
 public class ClpSerializer {
 	public static String getServletContextName() {
@@ -91,10 +99,6 @@ public class ClpSerializer {
 		}
 	}
 
-	public static void setClassLoader(ClassLoader classLoader) {
-		_classLoader = classLoader;
-	}
-
 	public static Object translateInput(BaseModel<?> oldModel) {
 		Class<?> oldModelClass = oldModel.getClass();
 
@@ -128,167 +132,33 @@ public class ClpSerializer {
 	}
 
 	public static Object translateInputRating(BaseModel<?> oldModel) {
-		RatingClp oldCplModel = (RatingClp)oldModel;
+		RatingClp oldClpModel = (RatingClp)oldModel;
 
-		Thread currentThread = Thread.currentThread();
+		BaseModel<?> newModel = oldClpModel.getRatingRemoteModel();
 
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
 
-		try {
-			currentThread.setContextClassLoader(_classLoader);
-
-			try {
-				Class<?> newModelClass = Class.forName("org.politaktiv.meinungsbild.infrastructure.model.impl.RatingImpl",
-						true, _classLoader);
-
-				Object newModel = newModelClass.newInstance();
-
-				Method method0 = newModelClass.getMethod("setRatingId",
-						new Class[] { Long.TYPE });
-
-				Long value0 = new Long(oldCplModel.getRatingId());
-
-				method0.invoke(newModel, value0);
-
-				Method method1 = newModelClass.getMethod("setUserId",
-						new Class[] { Long.TYPE });
-
-				Long value1 = new Long(oldCplModel.getUserId());
-
-				method1.invoke(newModel, value1);
-
-				Method method2 = newModelClass.getMethod("setSubtopicId",
-						new Class[] { Long.TYPE });
-
-				Long value2 = new Long(oldCplModel.getSubtopicId());
-
-				method2.invoke(newModel, value2);
-
-				Method method3 = newModelClass.getMethod("setScore",
-						new Class[] { Integer.TYPE });
-
-				Integer value3 = new Integer(oldCplModel.getScore());
-
-				method3.invoke(newModel, value3);
-
-				return newModel;
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
-
-		return oldModel;
+		return newModel;
 	}
 
 	public static Object translateInputSubtopic(BaseModel<?> oldModel) {
-		SubtopicClp oldCplModel = (SubtopicClp)oldModel;
+		SubtopicClp oldClpModel = (SubtopicClp)oldModel;
 
-		Thread currentThread = Thread.currentThread();
+		BaseModel<?> newModel = oldClpModel.getSubtopicRemoteModel();
 
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
 
-		try {
-			currentThread.setContextClassLoader(_classLoader);
-
-			try {
-				Class<?> newModelClass = Class.forName("org.politaktiv.meinungsbild.infrastructure.model.impl.SubtopicImpl",
-						true, _classLoader);
-
-				Object newModel = newModelClass.newInstance();
-
-				Method method0 = newModelClass.getMethod("setSubtopicId",
-						new Class[] { Long.TYPE });
-
-				Long value0 = new Long(oldCplModel.getSubtopicId());
-
-				method0.invoke(newModel, value0);
-
-				Method method1 = newModelClass.getMethod("setName",
-						new Class[] { String.class });
-
-				String value1 = oldCplModel.getName();
-
-				method1.invoke(newModel, value1);
-
-				Method method2 = newModelClass.getMethod("setUrl",
-						new Class[] { String.class });
-
-				String value2 = oldCplModel.getUrl();
-
-				method2.invoke(newModel, value2);
-
-				Method method3 = newModelClass.getMethod("setParentTopic",
-						new Class[] { Long.TYPE });
-
-				Long value3 = new Long(oldCplModel.getParentTopic());
-
-				method3.invoke(newModel, value3);
-
-				return newModel;
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
-
-		return oldModel;
+		return newModel;
 	}
 
 	public static Object translateInputTopic(BaseModel<?> oldModel) {
-		TopicClp oldCplModel = (TopicClp)oldModel;
+		TopicClp oldClpModel = (TopicClp)oldModel;
 
-		Thread currentThread = Thread.currentThread();
+		BaseModel<?> newModel = oldClpModel.getTopicRemoteModel();
 
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
 
-		try {
-			currentThread.setContextClassLoader(_classLoader);
-
-			try {
-				Class<?> newModelClass = Class.forName("org.politaktiv.meinungsbild.infrastructure.model.impl.TopicImpl",
-						true, _classLoader);
-
-				Object newModel = newModelClass.newInstance();
-
-				Method method0 = newModelClass.getMethod("setTopicId",
-						new Class[] { Long.TYPE });
-
-				Long value0 = new Long(oldCplModel.getTopicId());
-
-				method0.invoke(newModel, value0);
-
-				Method method1 = newModelClass.getMethod("setName",
-						new Class[] { String.class });
-
-				String value1 = oldCplModel.getName();
-
-				method1.invoke(newModel, value1);
-
-				Method method2 = newModelClass.getMethod("setCommunityId",
-						new Class[] { Long.TYPE });
-
-				Long value2 = new Long(oldCplModel.getCommunityId());
-
-				method2.invoke(newModel, value2);
-
-				return newModel;
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
-
-		return oldModel;
+		return newModel;
 	}
 
 	public static Object translateInput(Object obj) {
@@ -350,152 +220,108 @@ public class ClpSerializer {
 		}
 	}
 
-	public static Object translateOutputRating(BaseModel<?> oldModel) {
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-
-		try {
-			currentThread.setContextClassLoader(_classLoader);
-
+	public static Throwable translateThrowable(Throwable throwable) {
+		if (_useReflectionToTranslateThrowable) {
 			try {
-				RatingClp newModel = new RatingClp();
+				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream = new UnsyncByteArrayOutputStream();
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(unsyncByteArrayOutputStream);
 
-				Class<?> oldModelClass = oldModel.getClass();
+				objectOutputStream.writeObject(throwable);
 
-				Method method0 = oldModelClass.getMethod("getRatingId");
+				objectOutputStream.flush();
+				objectOutputStream.close();
 
-				Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
+				UnsyncByteArrayInputStream unsyncByteArrayInputStream = new UnsyncByteArrayInputStream(unsyncByteArrayOutputStream.unsafeGetByteArray(),
+						0, unsyncByteArrayOutputStream.size());
 
-				newModel.setRatingId(value0);
+				Thread currentThread = Thread.currentThread();
 
-				Method method1 = oldModelClass.getMethod("getUserId");
+				ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
-				Long value1 = (Long)method1.invoke(oldModel, (Object[])null);
+				ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(unsyncByteArrayInputStream,
+						contextClassLoader);
 
-				newModel.setUserId(value1);
+				throwable = (Throwable)objectInputStream.readObject();
 
-				Method method2 = oldModelClass.getMethod("getSubtopicId");
+				objectInputStream.close();
 
-				Long value2 = (Long)method2.invoke(oldModel, (Object[])null);
-
-				newModel.setSubtopicId(value2);
-
-				Method method3 = oldModelClass.getMethod("getScore");
-
-				Integer value3 = (Integer)method3.invoke(oldModel,
-						(Object[])null);
-
-				newModel.setScore(value3);
-
-				return newModel;
+				return throwable;
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (SecurityException se) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Do not use reflection to translate throwable");
+				}
+
+				_useReflectionToTranslateThrowable = false;
+			}
+			catch (Throwable throwable2) {
+				_log.error(throwable2, throwable2);
+
+				return throwable2;
 			}
 		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
+
+		Class<?> clazz = throwable.getClass();
+
+		String className = clazz.getName();
+
+		if (className.equals(PortalException.class.getName())) {
+			return new PortalException();
 		}
 
-		return oldModel;
+		if (className.equals(SystemException.class.getName())) {
+			return new SystemException();
+		}
+
+		if (className.equals(
+					"org.politaktiv.meinungsbild.infrastructure.NoSuchRatingException")) {
+			return new org.politaktiv.meinungsbild.infrastructure.NoSuchRatingException();
+		}
+
+		if (className.equals(
+					"org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException")) {
+			return new org.politaktiv.meinungsbild.infrastructure.NoSuchSubtopicException();
+		}
+
+		if (className.equals(
+					"org.politaktiv.meinungsbild.infrastructure.NoSuchTopicException")) {
+			return new org.politaktiv.meinungsbild.infrastructure.NoSuchTopicException();
+		}
+
+		return throwable;
+	}
+
+	public static Object translateOutputRating(BaseModel<?> oldModel) {
+		RatingClp newModel = new RatingClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setRatingRemoteModel(oldModel);
+
+		return newModel;
 	}
 
 	public static Object translateOutputSubtopic(BaseModel<?> oldModel) {
-		Thread currentThread = Thread.currentThread();
+		SubtopicClp newModel = new SubtopicClp();
 
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		newModel.setModelAttributes(oldModel.getModelAttributes());
 
-		try {
-			currentThread.setContextClassLoader(_classLoader);
+		newModel.setSubtopicRemoteModel(oldModel);
 
-			try {
-				SubtopicClp newModel = new SubtopicClp();
-
-				Class<?> oldModelClass = oldModel.getClass();
-
-				Method method0 = oldModelClass.getMethod("getSubtopicId");
-
-				Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
-
-				newModel.setSubtopicId(value0);
-
-				Method method1 = oldModelClass.getMethod("getName");
-
-				String value1 = (String)method1.invoke(oldModel, (Object[])null);
-
-				newModel.setName(value1);
-
-				Method method2 = oldModelClass.getMethod("getUrl");
-
-				String value2 = (String)method2.invoke(oldModel, (Object[])null);
-
-				newModel.setUrl(value2);
-
-				Method method3 = oldModelClass.getMethod("getParentTopic");
-
-				Long value3 = (Long)method3.invoke(oldModel, (Object[])null);
-
-				newModel.setParentTopic(value3);
-
-				return newModel;
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
-
-		return oldModel;
+		return newModel;
 	}
 
 	public static Object translateOutputTopic(BaseModel<?> oldModel) {
-		Thread currentThread = Thread.currentThread();
+		TopicClp newModel = new TopicClp();
 
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		newModel.setModelAttributes(oldModel.getModelAttributes());
 
-		try {
-			currentThread.setContextClassLoader(_classLoader);
+		newModel.setTopicRemoteModel(oldModel);
 
-			try {
-				TopicClp newModel = new TopicClp();
-
-				Class<?> oldModelClass = oldModel.getClass();
-
-				Method method0 = oldModelClass.getMethod("getTopicId");
-
-				Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
-
-				newModel.setTopicId(value0);
-
-				Method method1 = oldModelClass.getMethod("getName");
-
-				String value1 = (String)method1.invoke(oldModel, (Object[])null);
-
-				newModel.setName(value1);
-
-				Method method2 = oldModelClass.getMethod("getCommunityId");
-
-				Long value2 = (Long)method2.invoke(oldModel, (Object[])null);
-
-				newModel.setCommunityId(value2);
-
-				return newModel;
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
-
-		return oldModel;
+		return newModel;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(ClpSerializer.class);
-	private static ClassLoader _classLoader;
 	private static String _servletContextName;
+	private static boolean _useReflectionToTranslateThrowable = true;
 }
