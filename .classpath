@@ -4,15 +4,19 @@
 	<classpathentry kind="src" path="docroot/WEB-INF/service"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/com.liferay.ide.eclipse.server.tomcat.runtimeClasspathProvider/Liferay v6.1 CE (Tomcat 7) (2)">
-		<attributes>
-			<attribute name="owner.project.facets" value="jst.web"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/home/politaktiv/code/liferay-portal-6.2.0-ce-ga1/tomcat-7.0.42/lib/ext/portal-service.jar"/>
 	<classpathentry kind="lib" path="/home/politaktiv/code/liferay-portal-6.2.0-ce-ga1/tomcat-7.0.42/lib/ext/portlet.jar"/>
 	<classpathentry kind="lib" path="/home/politaktiv/code/liferay-portal-6.2.0-ce-ga1/tomcat-7.0.42/webapps/ROOT/WEB-INF/lib/util-bridges.jar"/>
 	<classpathentry kind="lib" path="/home/politaktiv/code/liferay-portal-6.2.0-ce-ga1/tomcat-7.0.42/webapps/ROOT/WEB-INF/lib/util-java.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/com.liferay.ide.eclipse.server.tomcat.runtimeClasspathProvider/Liferay v6.2 CE (Tomcat 7)">
+		<attributes>
+			<attribute name="owner.project.facets" value="jst.web"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_45">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="docroot/WEB-INF/classes"/>
 </classpath>
