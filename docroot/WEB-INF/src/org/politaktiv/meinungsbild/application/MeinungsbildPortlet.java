@@ -62,8 +62,8 @@ public class MeinungsbildPortlet extends MVCPortlet{
 		
 		try {
 			setOfOpinion = repository.getSetOfOpinionByCommunityIdAndUserId(this.getCurrentCommunityId(renderRequest),
-																		this.getCurrentUserId(renderRequest),
-																		renderRequest.getPreferences());
+				this.getCurrentUserId(renderRequest),
+				renderRequest.getPreferences());
 		} catch (SystemException e) {
 			SessionErrors.add(renderRequest, "veryBigError");
 		}

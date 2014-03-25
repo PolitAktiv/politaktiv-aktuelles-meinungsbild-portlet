@@ -266,10 +266,12 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 			    		<% String user_rate_subtopicId = "user_rate_" + subtopic.getSubtopicId(); %>
 			    				<b id='<portlet:namespace/><%= user_rate_subtopicId %>' > <%= subtopic.getCurentUserScore() %> </b>
 			    		</aui:column>
+			    		<%--
 			    		<aui:column>
 			    				<aui:button id="meinungsbild_rate_button" name="thema" type="button" value="-" onclick="<%= sendMinusCall %>" />
 			    				<aui:button id="meinungsbild_rate_button" name="thema" type="button" value="+" onclick="<%= sendPlusCall %>" />
 			    		</aui:column>
+			    		--%>
 		    		<% } %>
 		    		<aui:column>
 		    				<label><liferay-ui:message key="total" />:</label>
