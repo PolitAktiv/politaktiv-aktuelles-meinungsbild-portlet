@@ -91,8 +91,8 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 		defaultShowContent="false" align="buttom">
 
 	<aui:form name="fm" action="<%= doSaveMaximumRartingsURLString %>" method="post">
-						<aui:input value="<%= setOfOpinion.getNumberOfMaximumScoresByUser() %>" type="number" id="maximum_rating_per_user" name="maximumRatingPerUserFormInput" label="Maximum Bewertungen pro Bï¿½rger (Richtwert: Wurzel der Themenanzahl, Wichtig: grï¿½ï¿½er 0)" />
-						<aui:select name="maximumOfRatingPerSubtopicFormInput" label="Maximale Bewertung pro Unterthema pro Bï¿½rger">
+						<aui:input value="<%= setOfOpinion.getNumberOfMaximumScoresByUser() %>" type="number" id="maximum_rating_per_user" name="maximumRatingPerUserFormInput" label="Maximum Bewertungen pro Bürger (Richtwert: Wurzel der Themenanzahl, Wichtig: größer 0)" />
+						<aui:select name="maximumOfRatingPerSubtopicFormInput" label="Maximale Bewertung pro Unterthema pro Bürger">
 						<% for(int i = 1; i<= 6; i++){ %>
 							<aui:option value="<%= i %>" selected="<%= (i == setOfOpinion.getNumberOfMaximumScoreBySubtopic()) %>"> 
 								<%= i %>
@@ -114,7 +114,7 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 				<% } %>
 				<% if(permission_to_delete_topic) {%>
 					<td>
-						Thema lï¿½schen
+						Thema löschen
 					</td>
 				<% } %>
 				<% if(permission_to_add_subtopic) {%>
@@ -129,7 +129,7 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 				<% } %>
 				<% if(permission_to_delete_subtopic)  {%>
 					<td>
-						Unterthema lï¿½schen
+						Unterthema löschen
 					</td>
 				<% } %>
 				
@@ -143,7 +143,7 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 					<td>
 						<aui:form name="fm" action="<%= doAddTopicURLString %>" method="post">
 							<aui:input type="text" id="topic_name" name="topicNameAddFormInput" label="Name"/>
-							<aui:button type="submit" id="add_topic" value="Hinzufï¿½gen"/>
+							<aui:button type="submit" id="add_topic" value="Hinzufügen"/>
 						</aui:form> 
 					</td>
 				<% } %>
@@ -166,14 +166,14 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 					<aui:form name="fm" action="<%= doAddSubtopicURLString %>" method="post">
 						<aui:input type="text" id="subtopic_name" name="subtopicNameAddFormInput" label="Name"/>
 						<aui:input type="text" id="subtopic_url" name="subtopicUrlAddFormInput" label="URL zum Beitrag"/>
-						<aui:select name="topicIdToAddSubtopicFormInput" label="Fï¿½r Thema:">
+						<aui:select name="topicIdToAddSubtopicFormInput" label="Für Thema:">
 						<% for(Topic topic: topicList){ %>
 							<aui:option value="<%= topic.getTopicId() %>">
 								<%= topic.getName() %>
 							</aui:option>
 						<% } %>
 						</aui:select>
-						<aui:button type="submit" id="add_subtopic" value="Hinzufï¿½gen"/>
+						<aui:button type="submit" id="add_subtopic" value="Hinzufügen"/>
 					</aui:form>
 				</td>
 				<% } %>
@@ -227,7 +227,7 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 <% } %>
 
 
-	<% //TODO hier nach communityzugehï¿½rigkeit fragen %>
+	<% //TODO hier nach communityzugehörigkeit fragen %>
 	<% if(user_is_community_member) {%>
 	<liferay-ui:message key="you-have-given-x-from-y-points-you-can-give-a-maximum-of-z"
 	arguments="<%= new String[] {String.valueOf(setOfOpinion.getSumOfUserRatings()),String.valueOf(setOfOpinion.getNumberOfMaximumScoresByUser()), String.valueOf(setOfOpinion.getNumberOfMaximumScoreBySubtopic())} %>"
