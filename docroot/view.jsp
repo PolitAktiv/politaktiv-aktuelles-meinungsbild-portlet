@@ -245,7 +245,7 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
     		<b><%= topic.getName() %></b> &nbsp;&nbsp; <liferay-ui:message key="points" />:	<b><%= topic.getTotalTopicScore() %> </b>
     		
     			<% for(Subtopic subtopic : topic.getSubtopics()){ %>
-<!--     			generate Links fï¿½r javascript ajax call -->
+<!--     			generate Links für javascript ajax call -->
     			<% String sendMinusCall = "sendEvent(" + subtopic.getSubtopicId() + ",'minusPress')" ;%>
     			<% String sendPlusCall = "sendEvent(" + subtopic.getSubtopicId() + ",'plusPress')"; %>
 	    		<ul class="subtopic_expandable" id="meinungsbild_subtopic_lu">
@@ -257,7 +257,7 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 	    			<% } %>
 	    		<aui:fieldset>	
 	    		
-<!-- 	    			show user score  and rating ponly if user is signed in -->
+<!-- 	    			show user score  and rating only if user is signed in -->
 	    			<% if(user_is_community_member){ %>
 		    			<aui:column>
 		    					<liferay-ui:message key="yours" />:
@@ -300,17 +300,17 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 		</portlet:resourceURL>
     	
     	<aui:script>
-            function sendEvent(subtopicId,action) {
+            function sendEvent(subtopicId,action) { 
 
-                AUI().use('aui-io-request-deprecated', function(A) {
+                AUI().use('aui-io-request-depricated', function(A) {
                     A.io.request('<%= eventHandlerURL %>', {
                         method: 'POST',
-                        dataType: 'json',
+                        dataType: 'JSON', 
                         data: {
-                            subtopicId: subtopicId,
-                            action: action
+                            <portlet:namespace/>subtopicId: subtopicId,
+                            <portlet:namespace/>action: action
                         },
-                        on: {
+                        on: { 
                             success: function() {
                                 var result = this.get('responseData');
                                 if(result == "error"){
@@ -326,10 +326,6 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
                     });
                 });
               }
-              
-
-
-			
 
 
 			
