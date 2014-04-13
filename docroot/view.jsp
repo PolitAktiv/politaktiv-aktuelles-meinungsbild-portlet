@@ -54,7 +54,7 @@ List<Topic> topicList = setOfOpinion.getTopicList();
 <portlet:actionURL name="doDeleteSubtopic" var="doDeleteSubtopicURL" />
 
 <%
-String doSaveMaximumRartingsURLString = doSaveMaximumRatingsURL.toString();
+String doSaveMaximumRatingsURLString = doSaveMaximumRatingsURL.toString();
 String doAddTopicURLString = doAddTopicURL.toString();
 String doDeleteTopicURLString = doDeleteTopicURL.toString();
 String doAddSubtopicURLString = doAddSubtopicURL.toString();
@@ -84,13 +84,13 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 	}
 </aui:script>
  	
- 		
+		
 <% if(user_has_minimum_one_permission){ %>
-	<liferay-ui:toggle-area hideMessage='<%= LanguageUtil.get(pageContext,"hide-moderator-controls") %>'
+	<liferay-ui:toggle-area id="toggle_moderator_controls" hideMessage='<%= LanguageUtil.get(pageContext,"hide-moderator-controls") %>'
 		showMessage='<%= LanguageUtil.get(pageContext,"show-moderator-controls") %>'
-		defaultShowContent="false" align="buttom">
+		defaultShowContent="false" align="bottom">
 
-	<aui:form name="fm" action="<%= doSaveMaximumRartingsURLString %>" method="post">
+	<aui:form name="fm" action="<%= doSaveMaximumRatingsURLString %>" method="post">
 						<aui:input value="<%= setOfOpinion.getNumberOfMaximumScoresByUser() %>" type="number" id="maximum_rating_per_user" name="maximumRatingPerUserFormInput" label="Maximum Bewertungen pro Bürger (Richtwert: Wurzel der Themenanzahl, Wichtig: größer 0)" />
 						<aui:select name="maximumOfRatingPerSubtopicFormInput" label="Maximale Bewertung pro Unterthema pro Bürger">
 						<% for(int i = 1; i<= 6; i++){ %>
