@@ -1,3 +1,4 @@
+<%@page import="org.politaktiv.meinungsbild.infrastructure.model.SubtopicClp"%>
 <%
 /**
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -241,13 +242,13 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
     		<% for( Topic topic: topicList){ %>
     		<div class="topic_frame">
     		<input class="subtopic_expand_selector" type="checkbox" id="<%= "expand" + topic.getTopicId() %>"/> 
-    		<label class="tree_expand_selector" for="<%= "expand" + topic.getTopicId() %>">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-    		<b><%= topic.getName() %></b> &nbsp;&nbsp; <liferay-ui:message key="points" />:	<b><%= topic.getTotalTopicScore() %> </b>
-    		
+    		<label class="tree_expand_selector" for="<%= "expand" + topic.getTopicId() %>">
+    		&nbsp;&nbsp;&nbsp;&nbsp;<b><%= topic.getName() %>&nbsp;&nbsp;</b><liferay-ui:message key="points" />:&nbsp;&nbsp;	<b><%= topic.getTotalTopicScore() %> </b>
+    		</label>
     			<% for(Subtopic subtopic : topic.getSubtopics()){ %>
 <!--     			generate Links für javascript ajax call -->
-    			<% String sendMinusCall = "sendEvent(" + subtopic.getSubtopicId() + ",'minusPress')" ;%>
-    			<% String sendPlusCall = "sendEvent(" + subtopic.getSubtopicId() + ",'plusPress')"; %>
+    			<% String sendMinusCall = "sendEvent(" + subtopic.getSubtopicId() + ",'minusPress');" ;%>
+    			<% String sendPlusCall = "sendEvent(" + subtopic.getSubtopicId() + ",'plusPress');"; %>
 	    		<ul class="subtopic_expandable" id="meinungsbild_subtopic_lu">
 	    			<li>
 	    			<%if(!subtopic.getUrl().isEmpty()){ %>
@@ -262,23 +263,21 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
 		    			<aui:column>
 		    					<liferay-ui:message key="yours" />:
 		    			</aui:column>
-			    		<aui:column>
-			    		<% String user_rate_subtopicId = "user_rate_" + subtopic.getSubtopicId(); %>
-			    				<b id='<portlet:namespace/><%= user_rate_subtopicId %>' > <%= subtopic.getCurentUserScore() %> </b>
-			    		</aui:column>
+
 			    		
 			    		<aui:column>
 			    				<aui:button id="meinungsbild_rate_button" name="thema" type="button" value="-" onclick="<%= sendMinusCall %>" />
+			    				<% String user_rate_subtopicId = "user_rate_" + subtopic.getSubtopicId(); %>
+			    					<b id='<portlet:namespace/><%= user_rate_subtopicId %>' > <%= subtopic.getCurentUserScore() %> </b>
 			    				<aui:button id="meinungsbild_rate_button" name="thema" type="button" value="+" onclick="<%= sendPlusCall %>" />
 			    		</aui:column>
-			    		
+			    	</br>	</br>
 		    		<% } %>
-		    		<aui:column>
-		    				<label><liferay-ui:message key="total" />:</label>
+
+		    		<aui:column id='<%="full_community_score_label_" + subtopic.getSubtopicId()%>'>
+		    				<label><liferay-ui:message key="total" />: <b>&nbsp;&nbsp;&nbsp;<%= subtopic.getFullCommunityScore() %> </b> </label>		
 		    		</aui:column>
-		    		<aui:column>
-		    				<b><%= subtopic.getFullCommunityScore() %> </b>
-		    		</aui:column>
+		    		
 		    	</aui:fieldset>
 	    			</li>
 	    		</ul>
@@ -324,11 +323,10 @@ boolean user_is_community_member = GroupLocalServiceUtil.hasUserGroup(themeDispl
                             }
                         }
                     });
-                });
+                });								
               }
-
-
-			
-         </aui:script>
+   </aui:script>
+   
+   
 
         
