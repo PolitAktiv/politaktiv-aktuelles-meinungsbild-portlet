@@ -1,4 +1,12 @@
 ReleaseNotes:
+-----------------------------
+-----------------------------
+
+
+
+6.2.0.1 - 02.05.2014
+--------------------
+first version for testing purposes on intermediate server after migration
 
 6.1.0.2 - 19.9.2012
 ----------------------------
