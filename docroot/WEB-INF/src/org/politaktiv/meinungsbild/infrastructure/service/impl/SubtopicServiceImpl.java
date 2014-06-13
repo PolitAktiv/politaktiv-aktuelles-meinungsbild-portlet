@@ -16,7 +16,6 @@ package org.politaktiv.meinungsbild.infrastructure.service.impl;
 
 import org.politaktiv.meinungsbild.infrastructure.model.Subtopic;
 import org.politaktiv.meinungsbild.infrastructure.service.SubtopicLocalServiceUtil;
-import org.politaktiv.meinungsbild.infrastructure.service.TopicLocalServiceUtil;
 import org.politaktiv.meinungsbild.infrastructure.service.base.SubtopicServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;

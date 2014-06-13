@@ -20,8 +20,6 @@ import java.util.List;
 import org.politaktiv.meinungsbild.infrastructure.model.Subtopic;
 import org.politaktiv.meinungsbild.infrastructure.model.Topic;
 
-import com.liferay.portal.kernel.util.Validator;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 

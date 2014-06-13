@@ -64,8 +64,6 @@ public class MeinungsbildRepository {
 	
 	public void deleteTopic(long groupId,long topicId) throws PortalException, SystemException {
 		
-		Topic topic = TopicLocalServiceUtil.getTopic(topicId);
-		//get subtopics from topic
 		List<Subtopic> subtopicList = SubtopicLocalServiceUtil.getSubtopicsFromTopicId(topicId);
 		//remove topic
 		TopicServiceUtil.deleteTopic(groupId,topicId);
