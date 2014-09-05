@@ -1,5 +1,4 @@
-/build
-
 # Package Files #
 /classes
 /lib
+/lib/*
