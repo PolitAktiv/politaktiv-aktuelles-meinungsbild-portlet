@@ -15,7 +15,5 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="LiferayLibs/util-java.jar"/>
-	<classpathentry kind="var" path="LiferayLibs/util-bridges.jar"/>
 	<classpathentry kind="output" path="docroot/WEB-INF/classes"/>
 </classpath>

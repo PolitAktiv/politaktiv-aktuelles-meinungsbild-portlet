@@ -1,7 +1,7 @@
 /build
 
 # Package Files #
-*.class
+*.classes
 *.jar
 *.war
 *.ear
